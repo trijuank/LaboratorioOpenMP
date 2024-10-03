@@ -1,0 +1,22 @@
+#include <omp.h>
+#include <stdio.h>
+
+int main() {
+    #pragma omp parallel num_threads(10)
+    {
+        // Obtener el id del hilo
+        int hilo = omp_get_thread_num();
+        // Realizar el modulo del id del hilo
+        int mod = hilo % 2;
+        
+        if (mod == 0) {
+    // Cuando es par
+            printf("El hilo numero %d es par\n", hilo);
+        } else {
+    // Cuando es impar
+            printf("El hilo numero %d es impar\n", hilo);
+        }
+        
+    }
+    return 0;
+}
