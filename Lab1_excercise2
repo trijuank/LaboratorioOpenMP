@@ -1,1 +1,51 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <omp.h>
 
+#define SIZE 100
+
+int main() {
+    int arr[SIZE];
+    int max_value = 0;
+    int min_value = 10000;  // Inicializamos con un valor alto
+    long long sum_value = 0; // Usamos long long para evitar overflow con la suma
+
+    // Paralelización con OpenMP para inicializar el array
+    #pragma omp parallel for
+    for (int i = 0; i < SIZE; i++) {
+        arr[i] = rand() % 10000; // Número aleatorio entre 0 y 9999
+        printf("Elemento %d inicializado en hilo %d con valor %d\n", i, omp_get_thread_num(), arr[i]);
+    }
+
+    // Paralelización con OpenMP para encontrar el valor máximo
+    #pragma omp parallel for reduction(max:max_value)
+    for (int i = 0; i < SIZE; i++) {
+        if (arr[i] > max_value) {
+            max_value = arr[i];
+        }
+    }
+
+    // Paralelización con OpenMP para encontrar el valor mínimo
+    #pragma omp parallel for reduction(min:min_value)
+    for (int i = 0; i < SIZE; i++) {
+        if (arr[i] < min_value) {
+            min_value = arr[i];
+        }
+    }
+
+    // Paralelización con OpenMP para sumar todos los valores (para calcular el promedio)
+    #pragma omp parallel for reduction(+:sum_value)
+    for (int i = 0; i < SIZE; i++) {
+        sum_value += arr[i];
+    }
+
+    // Cálculo del promedio
+    double average_value = (double)sum_value / SIZE;
+
+    // Imprimir el valor máximo, mínimo y promedio
+    printf("El valor máximo del array es: %d\n", max_value);
+    printf("El valor mínimo del array es: %d\n", min_value);
+    printf("El valor promedio del array es: %.2f\n", average_value);
+
+    return 0;
+}
